@@ -7,12 +7,12 @@ function clamp(lo, value, hi) {
 function wrapTexture(texture) {
     return {
         _: texture,
-        loadContentsOf: function(element) {
+        loadContentsOf: function (element) {
             // Make sure that we're using the correct global WebGL context
             gl = this._.gl;
             this._.loadContentsOf(element);
         },
-        destroy: function() {
+        destroy: function () {
             // Make sure that we're using the correct global WebGL context
             gl = this._.gl;
             this._.destroy();
@@ -35,7 +35,9 @@ function initialize(width, height) {
         var testTexture = new Texture(100, 100, gl.RGBA, gl.FLOAT);
         try {
             // Only use gl.FLOAT if we can render to it
-            testTexture.drawTo(function() { type = gl.FLOAT; });
+            testTexture.drawTo(function () {
+                type = gl.FLOAT;
+            });
         } catch (e) {
         }
         testTexture.destroy();
@@ -59,17 +61,17 @@ function initialize(width, height) {
 }
 
 /*
-   Draw a texture to the canvas, with an optional width and height to scale to.
-   If no width and height are given then the original texture width and height
-   are used.
-*/
+ Draw a texture to the canvas, with an optional width and height to scale to.
+ If no width and height are given then the original texture width and height
+ are used.
+ */
 function draw(texture, width, height) {
     if (!this._.isInitialized || texture._.width != this.width || texture._.height != this.height) {
         initialize.call(this, width ? width : texture._.width, height ? height : texture._.height);
     }
 
     texture._.use();
-    this._.texture.drawTo(function() {
+    this._.texture.drawTo(function () {
         Shader.getDefaultShader().drawRect();
     });
 
@@ -84,7 +86,7 @@ function update() {
 
 function simpleShader(shader, uniforms, textureIn, textureOut) {
     (textureIn || this._.texture).use();
-    this._.spareTexture.drawTo(function() {
+    this._.spareTexture.drawTo(function () {
         shader.uniforms(uniforms).drawRect();
     });
     this._.spareTexture.swapWith(textureOut || this._.texture);
@@ -99,28 +101,28 @@ function replace(node) {
 function contents() {
     var texture = new Texture(this._.texture.width, this._.texture.height, gl.RGBA, gl.UNSIGNED_BYTE);
     this._.texture.use();
-    texture.drawTo(function() {
+    texture.drawTo(function () {
         Shader.getDefaultShader().drawRect();
     });
     return wrapTexture(texture);
 }
 
 /*
-   Get a Uint8 array of pixel values: [r, g, b, a, r, g, b, a, ...]
-   Length of the array will be width * height * 4.
-*/
+ Get a Uint8 array of pixel values: [r, g, b, a, r, g, b, a, ...]
+ Length of the array will be width * height * 4.
+ */
 function getPixelArray() {
     var w = this._.texture.width;
     var h = this._.texture.height;
     var array = new Uint8Array(w * h * 4);
-    this._.texture.drawTo(function() {
+    this._.texture.drawTo(function () {
         gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, array);
     });
     return array;
 }
 
 function wrap(func) {
-    return function() {
+    return function () {
         // Make sure that we're using the correct global WebGL context
         gl = this._.gl;
 
@@ -129,7 +131,7 @@ function wrap(func) {
     };
 }
 
-exports.canvas = function() {
+exports.canvas = function () {
     var canvas = document.createElement('canvas');
     try {
         gl = canvas.getContext('experimental-webgl', { premultipliedAlpha: false });
@@ -178,6 +180,9 @@ exports.canvas = function() {
     canvas.vignette = wrap(vignette);
     canvas.vibrance = wrap(vibrance);
     canvas.sepia = wrap(sepia);
+
+    canvas.colorize = wrap(colorize);
+    canvas.matrix = wrap(matrix);
 
     return canvas;
 };
