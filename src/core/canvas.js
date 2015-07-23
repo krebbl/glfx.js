@@ -183,6 +183,7 @@ exports.canvas = function () {
 
     canvas.colorize = wrap(colorize);
     canvas.matrix = wrap(matrix);
+    canvas.saturation = wrap(saturation);
 
     return canvas;
 };
